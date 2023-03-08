@@ -1,0 +1,15 @@
+import warnings
+import os
+
+import numpy as np
+import matplotlib.pyplot as plt
+from functions.measurement_DT9837 import measurement_DT9837
+
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+warnings.filterwarnings('ignore')
+
+''' --------- Parameters --------- '''
+fs = 48000
+R = 1                       # Resistor value [Ohm]
+
+''' --------- Signal Definition --------- '''
