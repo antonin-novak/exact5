@@ -50,4 +50,4 @@ ax.set(xlabel='Frequency [Hz]', ylabel='Magnitude [dB re 1 V]')
 plt.show()
 
 """ SAVE the result to a numpy zip (.npz) file  """
-# np.savez('HHFRF.npz', f_axis=f_axis, Hs=Hs)
+np.savez('HHFRF.npz', f_axis=f_axis, Hs=Hs)

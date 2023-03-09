@@ -13,3 +13,44 @@ fs = 48000
 R = 1                       # Resistor value [Ohm]
 
 ''' --------- Signal Definition --------- '''
+f0 = 1000
+T = 2
+t = np.arange(0, T, 1/fs)
+
+frequencies = np.unique(
+    np.round(np.logspace(np.log10(20), np.log10(20e3), 100)))
+
+x = 0
+for f0 in frequencies:
+    x += np.sin(2*np.pi*f0*t + 2*np.pi*np.random.rand())
+
+x /= np.max(np.abs(x))
+
+temp_buffer = measurement_DT9837(x, fs)
+in0 = np.array(temp_buffer[0::4])  # signal from input 0
+in1 = np.array(temp_buffer[1::4])  # signal from input 1
+
+fig, ax = plt.subplots()
+ax.plot(in0)
+
+utot = in0[-fs:]
+i = in1[-fs:]
+u = utot - R*i
+
+U_all = np.fft.rfft(u)
+I_all = np.fft.rfft(i)
+
+U = U_all[frequencies.astype('int')]
+I = I_all[frequencies.astype('int')]
+
+f_axis = np.fft.rfftfreq(len(u), 1/fs)
+
+fig, ax = plt.subplots()
+ax.semilogx(f_axis, 20*np.log10(np.abs(I_all)))
+ax.semilogx(frequencies, 20*np.log10(np.abs(I)))
+
+fig, ax = plt.subplots()
+ax.semilogx(frequencies, np.abs(U/I))
+
+
+plt.show()

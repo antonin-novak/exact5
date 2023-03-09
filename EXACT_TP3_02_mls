@@ -13,4 +13,65 @@ warnings.filterwarnings('ignore')
 fs = 48000
 R = 1                       # Resistor value [Ohm]
 
+''' --------- Example with the shift register --------- '''
+
+# M = 17
+# L = 2**M - 1
+
+# shift_register = np.ones(M)
+
+# x = np.zeros(L)
+# for n in range(L):
+#     x[n] = shift_register[-1]
+#     temp = np.logical_xor(shift_register[2], shift_register[-1])
+#     shift_register = np.roll(shift_register, 1)
+#     shift_register[0] = temp
+
+
 ''' --------- Signal Definition --------- '''
+
+M = 17
+L = 2**M - 1
+
+x = 2*max_len_seq(M)[0] - 1
+x = np.concatenate([x, x])
+
+''' --------- Measurement --------- '''
+
+temp_buffer = measurement_DT9837(x, fs)
+in0 = np.array(temp_buffer[0::4])  # signal from input 0
+in1 = np.array(temp_buffer[1::4])  # signal from input 1
+
+fig, ax = plt.subplots()
+ax.plot(in0)
+
+utot = in0[-L:]
+i = in1[-L:]
+u = utot - R*i
+
+U = np.fft.rfft(u)
+I = np.fft.rfft(i)
+f_axis = np.fft.rfftfreq(len(u), 1/fs)
+
+fig, ax = plt.subplots()
+ax.semilogx(f_axis, 20*np.log10(np.abs(I)))
+
+Z = U/I
+
+# the Z vector is too long and takes a lot of noise, lets make it shorter:
+z = np.fft.irfft(Z)
+N = 5000
+z = np.concatenate([z[:N], z[-N:]])
+# and lets convert it back to Freq. domain
+
+Z = np.fft.rfft(z)
+f_axis = np.fft.rfftfreq(len(z), 1/fs)
+
+fig, ax = plt.subplots()
+ax.semilogx(f_axis, np.abs(Z))
+
+
+plt.show()
+
+
+plt.show()
